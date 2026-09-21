@@ -175,14 +175,6 @@
             <div class="hero-circle circle-one"></div>
             <div class="hero-circle circle-two"></div>
 
-            <div class="floating-card card-top">
-                <span>🔥</span>
-                <div>
-                    <strong>Trending</strong>
-                    <small>Wireless Audio</small>
-                </div>
-            </div>
-
             <div class="hero-product">
 
                 <div class="product-glow"></div>
@@ -196,21 +188,6 @@
                 <span class="hero-product-label">
                     AUDIO PRO
                 </span>
-
-            </div>
-
-            <div class="floating-card card-bottom">
-
-                <div class="avatar-stack">
-                    <span>👩</span>
-                    <span>👨</span>
-                    <span>🧑</span>
-                </div>
-
-                <div>
-                    <strong>4.9 Rating</strong>
-                    <small>10,000+ reviews</small>
-                </div>
 
             </div>
 
@@ -241,31 +218,15 @@
         </div>
 
         <div class="category-grid">
-
-            <button class="category-card" data-category="Electronics">
-                <div class="category-icon">🎧</div>
-                <h3>Electronics</h3>
-                <span>24 Products →</span>
+            {% for cat in categories %}
+            <button class="category-card" data-category="{{ cat.name }}">
+                <div class="category-icon">{{ cat.icon }}</div>
+                <h3>{{ cat.name }}</h3>
+                <span>{{ cat.product_count }} Products →</span>
             </button>
-
-            <button class="category-card" data-category="Fashion">
-                <div class="category-icon">👟</div>
-                <h3>Fashion</h3>
-                <span>32 Products →</span>
-            </button>
-
-            <button class="category-card" data-category="Home">
-                <div class="category-icon">🛋️</div>
-                <h3>Home & Living</h3>
-                <span>18 Products →</span>
-            </button>
-
-            <button class="category-card" data-category="Beauty">
-                <div class="category-icon">✨</div>
-                <h3>Beauty</h3>
-                <span>27 Products →</span>
-            </button>
-
+            {% empty %}
+            <p>No categories found.</p>
+            {% endfor %}
         </div>
 
     </div>
@@ -287,27 +248,14 @@
             </div>
 
             <div class="filter-buttons">
-
                 <button class="filter active" data-filter="All">
                     All
                 </button>
-
-                <button class="filter" data-filter="Electronics">
-                    Electronics
+                {% for cat in categories %}
+                <button class="filter" data-filter="{{ cat.name }}">
+                    {{ cat.name }}
                 </button>
-
-                <button class="filter" data-filter="Fashion">
-                    Fashion
-                </button>
-
-                <button class="filter" data-filter="Home">
-                    Home
-                </button>
-
-                <button class="filter" data-filter="Beauty">
-                    Beauty
-                </button>
-
+                {% endfor %}
             </div>
 
         </div>
@@ -800,6 +748,11 @@
     </div>
 
 </div>
+
+<!-- Database Products Data -->
+<script id="products-data" type="application/json">
+    {{ products_json|safe }}
+</script>
 
 <!-- Updated for Django Static Files -->
 <script src="{% static 'js/script.js' %}"></script>

@@ -4,10 +4,21 @@
 
 
 /* =====================================================
-   PRODUCT DATABASE
+   PRODUCT DATABASE (Loaded dynamically from Django database)
    ===================================================== */
 
-const products = [
+const productsDataElement = document.getElementById("products-data");
+let dynamicProducts = [];
+
+if (productsDataElement && productsDataElement.textContent.trim()) {
+    try {
+        dynamicProducts = JSON.parse(productsDataElement.textContent);
+    } catch (err) {
+        console.error("Failed to parse database products JSON:", err);
+    }
+}
+
+const products = dynamicProducts.length > 0 ? dynamicProducts : [
     {
         id: 1,
         name: "Aero Wireless Headphones",
@@ -19,151 +30,9 @@ const products = [
         emoji: "🎧",
         color: "linear-gradient(135deg,#d9d8ff,#8e89ff)",
         badge: "BESTSELLER"
-    },
-
-    {
-        id: 2,
-        name: "Urban Runner Sneakers",
-        category: "Fashion",
-        price: 89,
-        oldPrice: 119,
-        rating: 4.8,
-        reviews: 216,
-        emoji: "👟",
-        color: "linear-gradient(135deg,#e7f4ff,#9bd0ff)",
-        badge: "TRENDING"
-    },
-
-    {
-        id: 3,
-        name: "Minimal Ceramic Lamp",
-        category: "Home",
-        price: 64,
-        oldPrice: 79,
-        rating: 4.7,
-        reviews: 145,
-        emoji: "💡",
-        color: "linear-gradient(135deg,#fff2d9,#ffc86b)",
-        badge: "NEW"
-    },
-
-    {
-        id: 4,
-        name: "Smart Watch Pro",
-        category: "Electronics",
-        price: 199,
-        oldPrice: 249,
-        rating: 4.9,
-        reviews: 487,
-        emoji: "⌚",
-        color: "linear-gradient(135deg,#e5e5e9,#a4a5ae)",
-        badge: "POPULAR"
-    },
-
-    {
-        id: 5,
-        name: "Everyday Oversized Hoodie",
-        category: "Fashion",
-        price: 59,
-        oldPrice: 79,
-        rating: 4.8,
-        reviews: 192,
-        emoji: "🧥",
-        color: "linear-gradient(135deg,#f0e5ff,#c19aff)",
-        badge: "SALE"
-    },
-
-    {
-        id: 6,
-        name: "Cloud Comfort Chair",
-        category: "Home",
-        price: 249,
-        oldPrice: 299,
-        rating: 4.9,
-        reviews: 98,
-        emoji: "🪑",
-        color: "linear-gradient(135deg,#e8f7ef,#9bd8b4)",
-        badge: "NEW"
-    },
-
-    {
-        id: 7,
-        name: "Glow Skin Care Set",
-        category: "Beauty",
-        price: 49,
-        oldPrice: 65,
-        rating: 4.8,
-        reviews: 267,
-        emoji: "🧴",
-        color: "linear-gradient(135deg,#ffe5ee,#ff9fbc)",
-        badge: "BESTSELLER"
-    },
-
-    {
-        id: 8,
-        name: "Studio Bluetooth Speaker",
-        category: "Electronics",
-        price: 79,
-        oldPrice: 99,
-        rating: 4.7,
-        reviews: 174,
-        emoji: "🔊",
-        color: "linear-gradient(135deg,#e5f1ff,#87b8ff)",
-        badge: "SALE"
-    },
-
-    {
-        id: 9,
-        name: "Essential Leather Bag",
-        category: "Fashion",
-        price: 109,
-        oldPrice: 139,
-        rating: 4.8,
-        reviews: 154,
-        emoji: "👜",
-        color: "linear-gradient(135deg,#f5e5d5,#c89569)",
-        badge: "POPULAR"
-    },
-
-    {
-        id: 10,
-        name: "Aroma Home Diffuser",
-        category: "Home",
-        price: 39,
-        oldPrice: 49,
-        rating: 4.6,
-        reviews: 88,
-        emoji: "🏺",
-        color: "linear-gradient(135deg,#fff1e2,#ffc38e)",
-        badge: "NEW"
-    },
-
-    {
-        id: 11,
-        name: "Daily Glow Face Serum",
-        category: "Beauty",
-        price: 35,
-        oldPrice: 45,
-        rating: 4.9,
-        reviews: 321,
-        emoji: "✨",
-        color: "linear-gradient(135deg,#fff0fa,#e99bd5)",
-        badge: "TOP RATED"
-    },
-
-    {
-        id: 12,
-        name: "Modern Desk Organizer",
-        category: "Home",
-        price: 29,
-        oldPrice: 39,
-        rating: 4.7,
-        reviews: 74,
-        emoji: "🗂️",
-        color: "linear-gradient(135deg,#e9efff,#a9baff)",
-        badge: "SALE"
     }
 ];
+
 
 
 /* =====================================================
@@ -310,6 +179,13 @@ function renderProducts() {
         const isWishlisted =
             wishlist.includes(product.id);
 
+        const oldPriceHtml = product.oldPrice
+            ? `<span class="old-price">$${Number(product.oldPrice).toFixed(2)}</span>`
+            : "";
+
+        const visualHtml = product.image
+            ? `<img src="${product.image}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:18px;">`
+            : `<span class="product-emoji">${product.emoji || "🛍️"}</span>`;
 
         const card =
             document.createElement("article");
@@ -321,11 +197,11 @@ function renderProducts() {
 
             <div
                 class="product-image"
-                style="background:${product.color}"
+                style="background:${product.color || "var(--bg-soft)"}"
             >
 
                 <span class="product-badge">
-                    ${product.badge}
+                    ${product.badge || "POPULAR"}
                 </span>
 
                 <button
@@ -336,9 +212,7 @@ function renderProducts() {
                     ${isWishlisted ? "♥" : "♡"}
                 </button>
 
-                <span class="product-emoji">
-                    ${product.emoji}
-                </span>
+                ${visualHtml}
 
             </div>
 
@@ -367,11 +241,9 @@ function renderProducts() {
 
                     <div class="price">
 
-                        $${product.price}
+                        $${Number(product.price).toFixed(2)}
 
-                        <span class="old-price">
-                            $${product.oldPrice}
-                        </span>
+                        ${oldPriceHtml}
 
                     </div>
 
@@ -616,13 +488,17 @@ function renderCart() {
         cartItem.className = "cart-item";
 
 
+        const cartVisual = product.image
+            ? `<img src="${product.image}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">`
+            : `${product.emoji || "🛍️"}`;
+
         cartItem.innerHTML = `
 
             <div
                 class="cart-item-image"
-                style="background:${product.color}"
+                style="background:${product.color || 'var(--bg-soft)'}"
             >
-                ${product.emoji}
+                ${cartVisual}
             </div>
 
 
